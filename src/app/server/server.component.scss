@@ -1,0 +1,14 @@
+.server {
+    padding: 1rem;
+    border: 2px solid;
+    border-radius: 6px;
+    color: white;
+
+    &.online {
+        border-color: darkgreen;
+    }
+
+    &.offline {
+        border-color: darkred;
+    }
+}
