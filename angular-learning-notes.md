@@ -49,8 +49,8 @@
 
 - directives are instructions in the dom.
 - *ngIf: structural directive
-  - asterisk is used before structural directives
-  - angular behind the scenes will transform the element into something else
+    - asterisk is used before structural directives
+    - angular behind the scenes will transform the element into something else
 - \#: local reference
 - attribute directives: They do not add or remove elements. They only change the element they were
   placed on.
@@ -205,25 +205,62 @@ subscribe to these changes via these lifecycle hooks.
 
 ## @Directive
 
-- 
+-
 
 ## Services
 
 - How to inject a service into a component:
-```typescript
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  providers: [SomeService]
-})
-export class AppComponent {
-  constructor(private service: SomeService) {}
 
-  onSomeChange(text: string) {
-    this.loggingService.log(text)
-  }
-}
-```
+    ```typescript
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrls: ['./app.component.scss'],
+      providers: [SomeService]
+    })
+    export class AppComponent {
+      constructor(private service: SomeService) {
+      }
+    
+      onSomeChange(text: string) {
+        this.loggingService.log(text)
+      }
+    }
+    ```
+- Service metadata:
+    - You don't add **@Injectable()** to the service you want to inject somewhere just to the service
+      where you want to inject something.
+    ```typescript
+    import { Injectable } from '@angular/core'
+    
+    @Injectable()
+    export class LoggingService {
+      log(text: string) {
+        console.log(text)
+      }
+    }
+    ```
 
-next video: module 9 - lesson 7
+### Hierarchical injection of services
+
+- AppModule:
+    - Same instance of Service is available Application-wide.
+
+      ```typescript
+      import { AppComponent } from './app.component'
+      
+      @NgModule({
+        declarations: [AppComponent],
+        imports: [BrowserModule, HttpModule],
+        providers: [SomeService],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule {}
+      ```
+
+- AppComponent:
+    - Same instance of Service is available for **all Components** (but not for other Services).
+
+- Any other Component:
+    - Same instance of Service is available for **the Component an all its child components**.
+

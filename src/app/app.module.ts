@@ -16,6 +16,8 @@ import { ShoppingEditComponent } from './shopping-list/shopping-edit/shopping-ed
 import { HoverDirective } from './directives/hover/hover.directive'
 import { UnlessDirective } from './directives/unless/unless.directive'
 import { DropdownDirective } from './directives/dropdown/dropdown.directive'
+import { RecipeService } from './services/recipe/recipe.service'
+import { ShoppingListService } from './services/shopping-list/shopping-list.service'
 
 @NgModule({
   declarations: [
@@ -38,7 +40,7 @@ import { DropdownDirective } from './directives/dropdown/dropdown.directive'
     AppRoutingModule,
     FormsModule
   ],
-  providers: [],
+  providers: [RecipeService, ShoppingListService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
