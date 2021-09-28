@@ -18,6 +18,8 @@ import { UnlessDirective } from './directives/unless/unless.directive'
 import { DropdownDirective } from './directives/dropdown/dropdown.directive'
 import { RecipeService } from './services/recipe/recipe.service'
 import { ShoppingListService } from './services/shopping-list/shopping-list.service'
+import { NoRecipeSelectedComponent } from './recipes/no-recipe-selected/no-recipe-selected.component'
+import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component'
 
 @NgModule({
   declarations: [
@@ -33,7 +35,9 @@ import { ShoppingListService } from './services/shopping-list/shopping-list.serv
     ShoppingEditComponent,
     HoverDirective,
     UnlessDirective,
-    DropdownDirective
+    DropdownDirective,
+    NoRecipeSelectedComponent,
+    RecipeEditComponent
   ],
   imports: [
     BrowserModule,

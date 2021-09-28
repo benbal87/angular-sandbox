@@ -10,13 +10,13 @@
 - Node.js will be used behind the scenes by the cli to bundle and optimize our project.
 - Typescript is compiled by the cli.
 
-## App module
+# App module
 
 - bundle the functionalities of the app into packages
 - gives angular the information about which features the app will use and
 - the application can be split to multiple modules
 
-## View encapsulation
+# View encapsulation
 
 - [Angular Guide - View Encapsulation](https://angular.io/guide/view-encapsulation)
 - In Angular, component CSS styles are encapsulated into the component's view and don't affect the
@@ -39,7 +39,7 @@
     }
     ```
 
-## Import styles
+# Import styles
 
 - npm install --save bootstrap@3
 - bootstrap need to be installed with npm and need to be added to "angular.json" as the first
@@ -64,7 +64,7 @@
     </div>
     ```
 
-## @Input - decorator
+# @Input - decorator
 
 - @Input() lets a parent component update data in the child component.
     ```html
@@ -80,7 +80,7 @@
     }
     ```
 
-## @Output - decorator
+# @Output - decorator
 
 - (eventToListenForInParentComponentTemplate)="callbackFnInChildComponent($event)"
 - @Input() and @Output() give a child component a way to communicate with its parent component.
@@ -112,14 +112,14 @@
     }
     ```
 
-## Local Reference
+# Local Reference
 
 - Can be placed on any html element on the template.
 - It will hold a reference to the element.
 - Only can be used in the template. Not in the typescript code.
 - Example: <input type="text" #nameInputElementReference />
 
-## @ViewChild - decorator
+# @ViewChild - decorator
 
 - The local reference variable in the template can be accessed via this decorator.
     ```html
@@ -137,7 +137,7 @@
     }
     ```
 
-## @ContentChild - decorator
+# @ContentChild - decorator
 
 - It is for accessing a local reference of a html element which was added in the ng-content.
     ```html
@@ -167,7 +167,7 @@
     }
     ```
 
-## ng-content - directive
+# ng-content - directive
 
 - It serves as a hook to add to the component to mark the place for angular where it should add any
   content what it finds between the tags.
@@ -176,7 +176,7 @@
     <ng-content></ng-content>
     ```
 
-## Lifecycle hooks
+# Lifecycle hooks
 
 When a new component instantiated it goes through a couple of lifecycle hooks. It is possible to
 subscribe to these changes via these lifecycle hooks.
@@ -203,11 +203,7 @@ subscribe to these changes via these lifecycle hooks.
 - ngAfterViewChecked: Called every time the view (and child views) has been checked.
 - ngOnDestroy: Called once the component is about to be destroyed.
 
-## @Directive
-
--
-
-## Services
+# Services
 
 - How to inject a service into a component:
 
@@ -228,8 +224,8 @@ subscribe to these changes via these lifecycle hooks.
     }
     ```
 - Service metadata:
-    - You don't add **@Injectable()** to the service you want to inject somewhere just to the service
-      where you want to inject something.
+    - You don't add **@Injectable()** to the service you want to inject somewhere just to the
+      service where you want to inject something.
     ```typescript
     import { Injectable } from '@angular/core'
     
@@ -241,7 +237,7 @@ subscribe to these changes via these lifecycle hooks.
     }
     ```
 
-### Hierarchical injection of services
+## Hierarchical injection of services
 
 - AppModule:
     - Same instance of Service is available Application-wide.
@@ -264,3 +260,468 @@ subscribe to these changes via these lifecycle hooks.
 - Any other Component:
     - Same instance of Service is available for **the Component an all its child components**.
 
+# Routing
+
+You can define the routes in the **app.module.ts**.
+
+- **pathMatch: 'full'** is necessary if you define a route which has the same prefix as many other
+  route. More on [pathMatch](https://angular.io/guide/router-tutorial-toh#pathmatch)
+
+```typescript
+const appRoutes: Routes = [
+  {
+    path: 'users',
+    component: UsersComponent,
+    pathMatch: 'full',
+    children: [
+      { path: ':id', component: UserComponent },
+      { path: ':id/edit', component: UserEditComponent }
+    ]
+  },
+  { path: '**', component: PageNotFoundComponent }
+]
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    RouterModule.forRoot(routes)
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule {
+}
+```
+
+**router-outlet** is for the routes of the top level but not for the child routes. The
+UsersComponent child routes should be loaded nested in the component with another **router-outlet**.
+
+```html
+
+<router-outlet></router-outlet>
+```
+
+## routerLink
+
+- RouterLink without slash ("/") at the beginning is **relative** path and with it **absolute**
+  path.
+- If the path is **relative** it will add the selected path to the existing one. So if the url
+  was "http://localhost:4200/about" and the "settings" link is clicked then the new url will
+  be "http://localhost:4200/about/settings".
+- You can also use **relative** path like this: "../settings". That will mean to go up one level and
+  apply settings to url.
+- For the root path **Home** exact need to be added otherwise the link will be always active because
+  it's path matches all off the other links.
+- **queryParams** is just another bindable **property** of the **routerLink directive** where the
+  params has to be defined in an object.
+- **fragment** is to add hash params to the url.
+
+    ```html
+    <div class="component-container">
+      <ul class="nav nav-tabs">
+        <li
+          role="presentation"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <a routerLink="/">Home</a>
+        </li>
+        <li
+          role="presentation"
+          routerLinkActive="active"
+        >
+          <a routerLink="/about">About</a>
+        </li>
+        <li
+          role="presentation"
+          routerLinkActive="active"
+        >
+          <a
+            [routerLink]="['/personal']"
+            [queryParams]="{ allowEdit: '1' }"
+            [fragment]="loading"
+          >
+            Personal
+          </a>
+        </li>
+        <li
+          role="presentation"
+          routerLinkActive="active"
+        >
+          <a routerLink="settings">Settings</a>
+        </li>
+      </ul>
+    </div>
+    ```
+
+- Parameters can be passed to the routerLink too:
+
+    ```html
+    <a [routerLink]="['/personal', 10, 'Anna']"></a>
+    ```
+
+- In the example above the **10** and **'Anna'** are the parameters defined in the routes:
+
+    ```typescript
+        const appRoutes: Routes = [
+      {
+        path: 'personal/:id/:name',
+        component: UserComponent
+      }
+    ]
+    ```
+
+## Routing programatically
+
+- The **Router** from **'@angular/router'** have to be injected into the component in the
+  constructor. And then it can be used.
+- Unlike the **routerLink** the **navigate** function of the router doesn't know what is the current
+  route. So the relative path won't work here. Every path here is absolute.
+- Although the relative path can be configured via **relativeTo** in an object as a second argument
+  to the **navigate** function.
+- **activatedRoute** will inject to currently active route into the component.
+- **queryParamsHandling** the handling of the query params while navigating can be added. It can
+  have of type QueryParamsHandling = 'merge' | 'preserve' | '';
+
+    ```typescript
+    import { Component } from '@angular/core'
+    import { Router, ActivatedRoute } from '@angular/router'
+    
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrls: ['./app.component.scss']
+    })
+    export class AppComponent {
+      constructor(private router: Router, private activatedRoute: ActivatedRoute) {
+      }
+    
+      onSomeChange(id: number, userName: string) {
+        this.router.navigate(
+          ['/about', id, userName],
+          {
+            relativeTo: this.activatedRoute,
+            // Adding query and hash params
+            queryParams: { allowEdit: '1' },
+            fragment: 'loading',
+            queryParamsHandling: 'preserve'
+          }
+        )
+      }
+    }
+    ```
+
+- You can get **parameter** from route via **ActivatedRoute**.
+- The first option is to use the **activatedRoute.snapshot.params**. But that won't refresh if the
+  route changes but the component not.
+- You can also use **activatedRoute.snapshot.queryParams** and **activatedRoute.snapshot.fragment**.
+
+    ```typescript
+    const appRoutes: Routes = [
+      {
+        path: 'users/:id',
+        component: UserComponent
+      }
+    ]
+    ```
+    ```typescript
+        import { Component } from '@angular/core'
+        import { ActivatedRoute } from '@angular/router'
+        
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.scss']
+        })
+        export class AppComponent {
+          constructor(private activatedRoute: ActivatedRoute) {
+          }
+        
+          onSomeChange() {
+            const usedId: number = this.activatedRoute.snapshot.params['id']
+            // rest of the logic...
+          }
+        }
+    ```
+
+- The second option is just use the **params**. It is an observable, and you can subscribe to it.
+  But it will be necessary to **unsubscribe** from it before the component is destroyed. Else the
+  observable will live on in the memory.
+- You can also use **activatedRoute.queryParams** and **activatedRoute.fragment** to subscribe to
+  them.
+
+    ```typescript
+        import { Component } from '@angular/core'
+        import { ActivatedRoute, Params } from '@angular/router'
+        import { Subscription } from 'rxjs/Subscription'
+        
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.scss']
+        })
+        export class AppComponent implements ngOnInit, onDestroy {
+          usedId: number = -1
+          paramsSubscription: Subscription
+  
+          constructor(private activatedRoute: ActivatedRoute) {
+          }
+          
+          ngOnInit() {
+            this.paramsSubscription = this.route.params.subscribe((params: Params) => {
+              this.usedId = params['id']
+            })
+          }
+  
+          onDestroy() {
+            this.paramsSubscription.unsubscribe()
+          }
+        }
+    ```
+
+## Router Guards
+
+### canActivate and canActivateChild
+
+- Router guard is a service, so it needs to be added to the **providers** array in the
+  **app.module.ts**.
+
+    ```typescript
+    import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild } from '@angular/router'
+    import { Observable } from 'rxjs/Observable';
+    
+    export class AuthGuard implements CanActivate, CanActivateChild {
+      constructor(private authService: AuthService, private router: Router) {
+      }
+    
+      canActivate(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+      ): Observable<boolean> | Promise<boolean> | boolean {
+        this.authService.isAuthenticated()
+          .then((result: boolean) => {
+            if (result) {
+              return true
+            } else {
+              this.router.navigate(['/'])
+              return false
+            }
+          })
+      }
+  
+      canActivateChild(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+      ): Observable<boolean> | Promise<boolean> | boolean {
+        this.canActivate(route, state)
+      }
+    }
+    ```
+
+- The guard can be used in the canActivate array in the route items.
+
+    ```typescript
+    const appRoutes: Routes = [
+      {
+        path: 'editAccount',
+        component: AccountEditComponent,
+        canActivate: [AuthGuard]
+      }
+    ]
+    ```
+
+- The **canActivateChild** also can be used instead of **canActivate**. In this case only the child
+  routes will be protected.
+
+    ```typescript
+    const appRoutes: Routes = [
+      {
+        path: 'editAccount',
+        component: AccountEditComponent,
+        CanActivateChild: [AuthGuard]
+      }
+    ]
+    ```
+
+### **canDeactivateChild**
+
+- First the guard need to be implemented with a **canDeactivate** method which you must implement.
+
+    ```typescript
+        import { Observable } from 'rxjs/Observable';
+    import {
+      CanDeactivate,
+      ActivatedRouteSnapshot,
+      RouterStateSnapshot,
+      CanActivateChild
+    } from '@angular/router'
+    
+    export interface CanComponentDeactivate {
+      canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean
+    }
+    
+    export class CanDeactivateGuard implements CanDeactivate<CanComponentDeactivate> {
+    
+      canDeactivate(
+        component: CanComponentDeactivate,
+        currentRoute: ActivatedRouteSnapshot,
+        currentState: RouterStateSnapshot,
+        nextState?: RouterStateSnapshot
+      ): Observable<boolean> | Promise<boolean> | boolean {
+        return component.canDeactivate()
+      }
+    }
+    ```
+
+- Then the **CanDeactivateGuard** has to be added to one of the app routes:
+
+    ```typescript
+    const appRoutes: Routes = [
+      { path: 'edit', component: EditComponent, canDeactivate: [CanDeactivateGuard] },
+    ]
+    ```
+
+- Then the **CanComponentDeactivate** interface needs to be implemented in the class.
+
+    ```typescript
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrls: ['./app.component.scss']
+    })
+    export class AppComponent implements CanComponentDeactivate {
+      areChangesSaved: boolean = true
+    
+      constructor(private activatedRoute: ActivatedRoute) {
+      }
+    
+      canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+        if (!this.areChangesSaved) {
+          return confirm('Do you want to discard the changes?')
+        }
+        return true
+      }
+    }
+    ```
+
+## Passing data through Routing
+
+- The data need to be defined in on of the routes as an object.
+
+    ```typescript
+    const appRoutes: Routes = [
+      {
+        path: 'edit',
+        component: EditComponent,
+        data: {
+          message: 'YOLO!'
+        }
+      }
+    ]
+    ```
+
+- Then it can be used in the component.
+
+    ```typescript
+    import { Component, OnInit } from '@angular/core'
+    import { ActivatedRoute, Data } from '@angular/router' 
+  
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrls: ['./app.component.scss']
+    })
+    export class AppComponent implements ngOnInit {
+      message: string = ''
+    
+      constructor(private activatedRoute: ActivatedRoute) {
+      }
+    
+      ngOnInit() {
+        this.message = this.activatedRoute.snapshot.data['message']
+        this.route.data.subscribe((data: Data) => {
+          this.message = data['message']
+        })
+      }
+    }
+    ```
+
+## Load data before routing
+
+- First a resolver class need to be implemented.
+
+    ```typescript
+    import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+    import { Observable } from 'rxjs/Observable';
+    import { Injectable } from '@angular/core';
+    
+    import { ServersService } from '../servers.service';
+    
+    interface Server {
+      id: number;
+      name: string;
+      status: string;
+    }
+    
+    @Injectable()
+    export class ServerResolver implements Resolve<Server> {
+      constructor(private serversService: ServersService) {}
+    
+      resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Server> | Promise<Server> | Server {
+        return this.serversService.getServer(+route.params['id']);
+      }
+    }
+    ```
+
+- Then it should be referenced in the app routes with the **resole** property.
+
+    ```typescript
+    const appRoutes: Routes = [
+      {
+        path: 'servers',
+        // canActivate: [AuthGuard],
+        canActivateChild: [AuthGuard],
+        component: ServersComponent,
+        children: [
+        { path: ':id', component: ServerComponent, resolve: {server: ServerResolver} },
+      ] }
+    ];
+    ```
+
+- Then you can just get the server data in the **ngOnInit** method by subscribing to the **data**
+  in **ActivatedRoute**
+
+    ```typescript
+    import { Component, OnInit } from '@angular/core';
+    import { ActivatedRoute, Params, Router, Data } from '@angular/router';
+    import { ServersService } from '../servers.service';
+    
+    @Component({
+      selector: 'app-server',
+      templateUrl: './server.component.html',
+      styleUrls: ['./server.component.css']
+    })
+    export class ServerComponent implements OnInit {
+      server: {id: number, name: string, status: string};
+    
+      constructor(private serversService: ServersService,
+                  private route: ActivatedRoute,
+                  private router: Router) {
+      }
+    
+      ngOnInit() {
+        this.route.data.subscribe(
+          (data: Data) => {
+            this.server = data['server'];
+          }
+        );
+      }
+    
+      onEdit() {
+        this.router.navigate(['edit'], {relativeTo: this.route, queryParamsHandling: 'preserve'});
+      }
+    }
+    ```

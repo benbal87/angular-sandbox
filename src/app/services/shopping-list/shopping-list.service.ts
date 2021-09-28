@@ -2,7 +2,7 @@ import IngredientModel from '../../shopping-list/ingredient.model'
 import { EventEmitter } from '@angular/core'
 
 export class ShoppingListService {
-  ingredientsChanged = new EventEmitter<Array<IngredientModel>>();
+  ingredientsChanged = new EventEmitter<Array<IngredientModel>>()
 
   private ingredients: Array<IngredientModel> = [
     new IngredientModel('Apples', 5),

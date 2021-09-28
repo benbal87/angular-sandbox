@@ -1,52 +1,68 @@
-<div class="row" *ngIf="recipe">
-  <div class="col-xs-12">
-    <img
-      [src]="recipe?.imagePath"
-      alt="{{ recipe?.name }}"
-      class="img-responsive"
-      style="max-height: 300px;"
-    >
+<ng-container *ngIf="recipe">
+  <div class="row">
+    <div class="col-xs-12">
+      <img
+        [src]="recipe?.imagePath"
+        alt="{{ recipe?.name }}"
+        class="img-responsive"
+        style="max-height: 300px;"
+      >
+    </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <h1>{{ recipe?.name }}</h1>
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>{{ recipe?.name }}</h1>
+    </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <div class="btn-group" dropdownDirective>
-      <button type="button" class="btn btn-primary dropdown-toggle">
-        Manage Recipe
-        <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a style="cursor: pointer;" (click)="onAddIngredientToShoppingList()">
-            Add Ingredients to shopping list
-          </a>
-        </li>
-        <li>
-          <a href="#">Edit Recipe</a>
-        </li>
-        <li>
-          <a href="#">Delete Recipe</a>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="btn-group" dropdownDirective>
+        <button type="button" class="btn btn-primary dropdown-toggle">
+          Manage Recipe
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a
+              style="cursor: pointer;"
+              (click)="onAddIngredientToShoppingList()"
+            >
+              Add Ingredients to shopping list
+            </a>
+          </li>
+          <li>
+            <a
+              style="cursor: pointer;"
+              [routerLink]="['edit']"
+            >
+              Edit Recipe
+            </a>
+          </li>
+          <li>
+            <a style="cursor: pointer;">
+              Delete Recipe
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      {{ recipe?.description }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let ingredient of recipe?.ingredients">
+          {{ ingredient.name }} - {{ ingredient.amount }}
         </li>
       </ul>
     </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    {{ recipe?.description }}
-  </div>
-</div>
-<div class="row">
-  <div class="col-xs-12">
-    <ul class="list-group">
-      <li class="list-group-item" *ngFor="let ingredient of recipe?.ingredients">
-        {{ ingredient.name }} - {{ ingredient.amount }}
-      </li>
-    </ul>
-  </div>
+</ng-container>
+
+<div *ngIf="recipeIdFromUrl && !recipe">
+  <p>Recipe id not exists!</p>
 </div>
