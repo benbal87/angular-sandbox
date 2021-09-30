@@ -967,3 +967,476 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 }
 ```
+
+# Handling Forms in Angular Apps
+
+There are two approaches:
+
+- **Template-Driven**: Angular infers the Form Object from the DOM.
+- **reactive**: Form is created programatically and synchronized with the DOM.
+- For using the Angular forms functionality you have to insert to the imports array in the
+  **app.module.ts**.
+
+```typescript
+import { FormsModule } from '@angular/forms'
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule {
+}
+```
+
+## Template Driven Approach
+
+Angular will not automatically detect the form elements in a form. So you have to register the
+controls manually.
+
+- It can be achieved with the **ngModel** directive. It comes from the **FormsModule**. This will
+  tell Angular that the input is a control of the form.
+- You will also have to add the **name**.
+- With all of these, this control will registered of the javascript representation of the form.
+
+```html
+
+<form>
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input
+      type="text"
+      id="username"
+      class="form-control"
+      ngModel
+      name="username"
+    >
+  </div>
+</form>
+```
+
+### Submitting the Forms
+
+You can place **ngSubmit** on the form and add an action to it. And also add a local reference to
+the form.
+
+```html
+
+<form (ngSubmit)="onSubmit()" #f>
+  ...
+</form>
+```
+
+Because of the reference it will be easy to get the form reference in the **onSubmit** method.
+
+```typescript
+import { Component, HTMLFormElement } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  onSubmit(form: HTMLFormElement) {
+    // logic...
+  }
+}
+```
+
+To get the javascript object of the form you have to set the local reference to **ngForm**.
+
+```html
+
+<form (ngSubmit)="onSubmit()" #f="ngForm">
+  ...
+</form>
+```
+
+Now you can get the object of the form.
+
+```typescript
+import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  onSubmit(form: NgForm) {
+    // logic...
+  }
+}
+```
+
+You can also get access to the form reference via **@ViewChild**.
+
+### Form validation
+
+Validation directives:
+
+- required
+- email
+
+Validation css classes are dynamically injected to the DOM.
+
+- ng-dirty
+- ng-valid
+- ng-invalid
+- ng-touched
+- ng-pending
+
+```html
+
+<form (ngSubmit)="onSubmit()" #f="ngForm">
+  ...
+  <button
+    class="btn btn-primary"
+    type="submit"
+    [disabled]="!f.valid"
+  >
+    Submit
+  </button>
+</form>
+```
+
+You can use local reference in the form to handle validation messages.
+
+```html
+
+<form (ngSubmit)="onSubmit()" #f="ngForm">
+  ...
+  <div class="form-group">
+    <label for="email">Mail</label>
+    <input
+      type="email"
+      id="email"
+      class="form-control"
+      ngModel
+      name="email"
+      required
+      email
+      #email="ngModel"
+    >
+    <span class="help-block" *ngIf="!email.valid && email.touched">
+      Please enter a valid email!
+    </span>
+  </div>
+  ...
+</form>
+```
+
+### Default form control values:
+
+```typescript
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  defaultInput = 'YOLO!';
+}
+```
+
+```html
+
+<form (ngSubmit)="onSubmit()" #f="ngForm">
+  ...
+  <div class="form-group">
+    <label for="email">Mail</label>
+    <input
+      type="email"
+      id="email"
+      class="form-control"
+      [ngModel]="defaultInput"
+      name="email"
+      required
+      email
+      #email="ngModel"
+    >
+    <span class="help-block" *ngIf="!email.valid && email.touched">
+      Please enter a valid email!
+    </span>
+  </div>
+  ...
+</form>
+```
+
+### Grouping form controls: ngModelGroup
+
+- This allows display validation messages if a whole group is invalid.
+
+```html
+
+<form (ngSubmit)="onSubmit()" #f="ngForm">
+  <div
+    id="user-data"
+    ngModelGroup="userData"
+    #userData="ngModelGroup"
+  >
+  </div>
+  ...
+</form>
+```
+
+### Handling radio buttons
+
+- You can get the selected radio button value from the form object under **values** property. In
+  this case it will be **size**.
+
+```typescript
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  sizes = ['xs', 's', 'l', 'xl', 'xxl']
+}
+```
+
+```html
+
+<form (ngSubmit)="onSubmit()" #f="ngForm">
+  <div
+    class="radio"
+    *ngFor="let size of sizes"
+  >
+    <label>
+      <input
+        type="radio"
+        name="size"
+        ngModel
+        [value]="size"
+      />
+      {{ size }}
+    </label>
+  </div>
+  ...
+</form>
+```
+
+### Setting and patching form values
+
+- You can set the value of the whole form by using **setValue** on the form. However, this is not
+  the best approach because it will always override the whole form.
+- The better approach is to use the **form.patchValue** method.
+
+```typescript
+import { ViewChild } from '@angular/core'
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  @ViewChild('f') signupform: NgForm
+  sizes = ['xs', 's', 'l', 'xl', 'xxl']
+
+  someFunction() {
+    this.signupform.setValue({
+      userData: {// group
+        username: '',
+        email: '',
+        secret: ''
+      }
+    })
+
+    this.signupform.form.patchValue({
+      userData: {
+        username: 'SalaciousCrumb'
+      }
+    })
+  }
+}
+```
+
+### Reset the form
+
+```typescript
+import { ViewChild } from '@angular/core'
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  @ViewChild('f') signupform: NgForm
+
+  onSubmit() {
+    this.signupform.reset();
+  }
+}
+```
+
+## Reactive Approach
+
+For this approach the **ReactiveFormsModule** need to be imported in the **app.module.ts**
+
+- The form need to be initialized in the **ngOnInit** lifecycle hook with the **FormGroup**.
+- You need to define the form controls in the **FormGroup** by initializing **FormControl** objects.
+    - The first constructor argument is the initial value of the control.
+    - The second is the validator.
+    - The third is the async validator.
+
+```typescript
+ngOnInit() {
+  this.signupForm = new FormGroup({
+    'userData': new FormGroup({
+      'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)]),
+      'email': new FormControl(null, [Validators.required, Validators.email], this.forbiddenEmails)
+    }),
+    'gender': new FormControl('male'),
+    'hobbies': new FormArray([])
+  });
+}
+```
+
+- By default angular will auto detect the form and create a from for us. To avoid this, the
+  **formGroup** directive need to be added to the form.
+
+```html
+
+<form [formGroup]="signupForm">
+  ...
+</form>
+```
+
+- You need to add the **formControlName** directive to each form control to bind the control to the
+  one defined in the component typescript code.
+
+```html
+
+<form [formGroup]="signupForm">
+  <input
+    type="text"
+    id="username"
+    formControlName="username"
+    class="form-control"
+  >
+</form>
+```
+
+- To get the state of the form in the template you don't need to use local reference.
+- Also, the **formGroupName** need to be added for create a nested form group.
+
+```html
+
+<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+  <div formGroupName="userData">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        type="text"
+        id="username"
+        formControlName="username"
+        class="form-control"
+      >
+      <span
+        *ngIf="!signupForm.get('userData.username').valid && signupForm.get('userData.username').touched"
+        class="help-block"
+      >
+        Error message
+      </span>
+    </div>
+  </div>
+</form>
+```
+
+### Form Arrays
+
+- You can push **FormControl** objects to the **FormArray**.
+
+```typescript
+get controls() {
+  return (this.signupForm.get('hobbies') as FormArray).controls;
+}
+
+onAddHobby() {
+  const control = new FormControl(null, Validators.required);
+  (<FormArray>this.signupForm.get('hobbies')).push(control);
+}
+```
+
+```html
+
+<div formArrayName="hobbies">
+  <h4>Your Hobbies</h4>
+  <button
+    class="btn btn-default"
+    type="button"
+    (click)="onAddHobby()"
+  >Add Hobby
+  </button>
+  <div
+    class="form-group"
+    *ngFor="let hobbyControl of controls; let i = index"
+  >
+    <input type="text" class="form-control" [formControlName]="i">
+  </div>
+</div>
+```
+
+### Making a validator
+
+The validator will get the **FormControl** and should return **null** or and object with one key
+and a boolean value. The validation will be represented in the form object in the form of the given 
+key.
+
+```typescript
+forbiddenNames(control: FormControl): {[s: string]: boolean} {
+  return this.forbiddenUsernames.indexOf(control.value) !== -1
+    ? {'nameIsForbidden': true}
+    : null;
+}
+```
+
+You also need to add this function to the validator array. And you need to bind the function to 
+the class. Otherwise, there won't be any **forbiddenNames** in "this". Because that will be 
+another this which try to call the function.
+
+```typescript
+ngOnInit() {
+  this.signupForm = new FormGroup({
+    'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)]),
+  });
+}
+```
+
+#### Custom Async Validator
+
+```typescript
+  forbiddenEmails(control: FormControl): Promise<any> | Observable<any> {
+    const promise = new Promise<any>((resolve, reject) => {
+      setTimeout(() => {
+        if (control.value === 'test@test.com') {
+          resolve({'emailIsForbidden': true})
+        } else {
+          resolve(null)
+        }
+      }, 1500);
+    })
+    return promise
+  }
+```
+
+### Sign up to Form changes
+
+```typescript
+    this.signupForm.statusChanges.subscribe(
+      (status) => console.log(status)
+    );
+```
+

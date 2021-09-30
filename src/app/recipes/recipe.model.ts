@@ -6,15 +6,16 @@ class RecipeModel {
   public name: string
   public description: string
   public imagePath: string
-  public ingredients: IngredientModel[]
+  public ingredients: Array<IngredientModel>
 
   constructor(
+    id: number | undefined,
     name: string,
     description: string,
     imagePath: string,
-    ingredients: IngredientModel[]
+    ingredients: Array<IngredientModel>
   ) {
-    this.id = generateNumber()
+    this.id = id ?? generateNumber()
     this.name = name
     this.description = description
     this.imagePath = imagePath
