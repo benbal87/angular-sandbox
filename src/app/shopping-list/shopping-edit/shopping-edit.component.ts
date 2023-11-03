@@ -10,9 +10,9 @@ import { Subscription } from 'rxjs'
   styleUrls: ['./shopping-edit.component.scss']
 })
 export class ShoppingEditComponent implements OnInit, OnDestroy {
-  @ViewChild('f') shoppingListForm: NgForm
+  @ViewChild('f') shoppingListForm!: NgForm
 
-  private subscription: Subscription
+  private subscription!: Subscription
   editMode: boolean = false
   editItemIndex: number = -1
   editedItem: IngredientModel | undefined

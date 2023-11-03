@@ -6,6 +6,11 @@ import { isEmpty } from 'lodash'
 import IngredientModel from '../../shopping-list/ingredient.model'
 import RecipeModel from '../recipe.model'
 
+export type FG = {
+  amount: FormControl<number | null>;
+  name: FormControl<string | null>
+}
+
 @Component({
   selector: 'app-recipe-edit',
   templateUrl: './recipe-edit.component.html',
@@ -14,7 +19,7 @@ import RecipeModel from '../recipe.model'
 export class RecipeEditComponent implements OnInit {
   id: number | undefined
   editMode: boolean = false
-  recipeForm: FormGroup
+  recipeForm!: FormGroup
 
   constructor(
     private recipeService: RecipeService,
@@ -48,19 +53,19 @@ export class RecipeEditComponent implements OnInit {
       ingredients
     } = this.getRecipeFormDetails()
 
-    const formIngredients = new FormArray([])
+    const formIngredients: FormArray<FormGroup<FG>> =
+      new FormArray<FormGroup<FG>>([])
     if (!isEmpty(ingredients)) {
       ingredients.forEach((ingredient: IngredientModel) => {
         const { name, amount } = ingredient
-        formIngredients.push(
-          new FormGroup({
-            'name': new FormControl(name, Validators.required),
-            'amount': new FormControl(
-              amount,
-              [Validators.required, Validators.pattern(/^[1-9]+[0-9]*$/)]
-            )
-          })
-        )
+        const fg: FormGroup<FG> = new FormGroup({
+          'name': new FormControl(name, Validators.required),
+          'amount': new FormControl(
+            amount,
+            [Validators.required, Validators.pattern(/^[1-9]+[0-9]*$/)]
+          )
+        })
+        formIngredients.push(fg)
       })
     }
 
